@@ -16,12 +16,10 @@ class PetiteElement extends HTMLElement {
       })
     })
 
-    const t = options.template ? options.template : document.getElementById(`${this.localName}-template`)
+    const t = options.template ? options.template : document.getElementById(`${this.localName}-template`).content
     this.attachShadow({ mode: "open" })
     this.shadowRoot.append(document.createElement("vue-root"))
-    this.shadowRoot.children[0].append(
-      document.importNode(t.content, true)
-    )
+    this.shadowRoot.children[0].append(document.importNode(t, true))
 
     createApp(this).mount(this.shadowRoot.children[0])
   }
