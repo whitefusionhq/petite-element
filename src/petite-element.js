@@ -8,17 +8,17 @@ class PetiteElement extends HTMLElement {
     super()
   }
 
-  vue(data) {
+  vue(data, options = {}) {
     Object.keys(data).forEach(key => {
       Object.defineProperty(this, key, {
         get() { return data[key] },
         set(newValue) { data[key] = newValue }
       })
     })
- 
-    const t = document.getElementById(`${this.localName}-template`)
+
+    const t = options.template ? options.template : document.getElementById(`${this.localName}-template`)
     this.attachShadow({ mode: "open" })
-    this.shadowRoot.append(document.createElement("span"))
+    this.shadowRoot.append(document.createElement("vue-root"))
     this.shadowRoot.children[0].append(
       document.importNode(t.content, true)
     )
