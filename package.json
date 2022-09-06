@@ -1,0 +1,35 @@
+{
+  "name": "petite-element",
+  "version": "1.0.0",
+  "description": "Create web components using a custom element reactivity subsystem powered by petite-vue.",
+  "main": "src/petite-element.js",
+  "type": "module",
+  "scripts": {
+    "test:fixture": "rm -f test/fixture/out.* && node test/fixture/esbuild.config.js",
+    "test": "npm run test:fixture && node --test test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whitefusionhq/petite-element.git"
+  },
+  "author": "Jared White <jared@whitefusion.studio>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whitefusionhq/petite-element/issues"
+  },
+  "homepage": "https://github.com/whitefusionhq/petite-element#readme",
+  "dependencies": {
+    "petite-vue": "^0.4.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": false,
+    "printWidth": 100
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.7",
+    "esbuild-plugin-html-modules": "^0.4.0",
+    "jsdom": "^20.0.0",
+    "prettier": "^2.7.1"
+  }
+}
