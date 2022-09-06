@@ -1,8 +1,8 @@
 # petite-element (WIP)
 
-Create web components using a custom element reactivity subsystem powered by [petite-vue](https://github.com/vuejs/petite-vue).
+Create web components using a custom element reactivity subsystem powered by [petite-vue](https://github.com/vuejs/petite-vue). Built for use in particular with [HTML Modules and this esbuild plugin](https://github.com/whitefusionhq/esbuild-plugin-html-modules).
 
-Built for use in particular with [HTML Modules and this esbuild plugin](https://github.com/whitefusionhq/esbuild-plugin-html-modules).
+Styles are scoped by default due to the use of Shadow DOM, and reflection from attributes to properties and back again is handled for basic data types beyond mere strings such as numbers, arrays, and objects. 
 
 Example:
 
@@ -43,6 +43,20 @@ Example:
 <slot></slot>
 
 <button @click="myButtonHandler">Click me</button>
+
+<style>
+  :host {
+    display: block;
+  }
+
+  h1 {
+    color: var(--heading-color);
+  }
+
+  button {
+    font: inherit;
+  }
+</style>
 ```
 
 ```html

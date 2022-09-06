@@ -41,4 +41,19 @@ test("events work", async (t) => {
   await setTimeout()
   assert.equal(testPetiteEl.text, "Clicked!")
   assert.equal(testPetiteEl.shadowRoot.querySelector("h1").textContent, testPetiteEl.text)
+
+  // Poor man's SSR? :thinking:
+  //
+  // console.log(testPetiteEl.outerHTML.replace(/(<.*?>)/, `$1
+  //   <template shadowroot="open">
+  //     ${testPetiteEl.shadowRoot.innerHTML}
+  //   </template>
+  // `))
+})
+
+test("styles are in the shadow dom", async (t) => {
+  const { testing } = processBundle()
+  const testPetiteEl = testing.section.children[0]
+
+  assert(testPetiteEl.shadowRoot.querySelector("style"))
 })
