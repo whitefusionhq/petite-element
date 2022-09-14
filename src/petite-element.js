@@ -155,10 +155,10 @@ export class PetiteController {
   // Since petite-vue will render out the right classes on mount, we need to strip
   // the SSRed classes first, otherwise there's class duplication
   clearShorthandClasses(fragment) {
-    fragment.querySelectorAll("[\\:class]").forEach(node => {
+    fragment.querySelectorAll("[\\:class]").forEach((node) => {
       node.removeAttribute("class")
     })
-    fragment.querySelectorAll("[v-bind\\:class]").forEach(node => {
+    fragment.querySelectorAll("[v-bind\\:class]").forEach((node) => {
       node.removeAttribute("class")
     })
   }
