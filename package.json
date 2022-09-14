@@ -1,6 +1,6 @@
 {
   "name": "petite-element",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Create web components using a custom element reactivity subsystem powered by petite-vue.",
   "main": "src/petite-element.js",
   "type": "module",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.15.7",
-    "esbuild-plugin-html-modules": "^0.4.0",
+    "esbuild-plugin-html-modules": "^0.5.0",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1"
   }

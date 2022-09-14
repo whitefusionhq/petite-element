@@ -25,13 +25,14 @@ export class PetiteController {
   app
 
   constructor(host, options = {}) {
-    this.template = options.template.cloneNode(true)
-    if (this.template.querySelector("template")?.attributes?.length === 0) {
-      const embeddedTemplate = this.template.querySelector("template")
-      this.template.prepend(embeddedTemplate.content)
-      embeddedTemplate.remove()
+    if (options.template) {
+      this.template = options.template.cloneNode(true)
+      if (this.template.querySelector("template")?.attributes?.length === 0) {
+        const embeddedTemplate = this.template.querySelector("template")
+        this.template.prepend(embeddedTemplate.content)
+        embeddedTemplate.remove()
+      }
     }
-    this.findScopedStyles(host)
     this.data = this.findProps(host)
     this.useShadowRoot = options.shadowRoot ?? true
     ;(this.host = host).addController(this)
@@ -72,6 +73,7 @@ export class PetiteController {
       })
     })
 
+    host.hydrated = true
     this.data = reactive(this.data)
     this.app = createApp(host)
 
@@ -79,17 +81,32 @@ export class PetiteController {
       // petite-vue doesn't like mounting directly on the root, so we mount on a root node instead
       const rootShadowMount = document.createElement("petite-root")
       rootShadowMount.style.display = "contents"
-      rootShadowMount.append(this.template)
+      if (host.shadowRoot || host.querySelector("template[shadowroot]")) {
+        if (host.shadowRoot) {
+          // DSD is a go!
+          rootShadowMount.append(...host.shadowRoot.childNodes)
+        } else {
+          // We'll copy template content manually
+          rootShadowMount.append(host.querySelector("template[shadowroot]").content.cloneNode(true))
+        }
+      } else {
+        if (this.template) {
+          rootShadowMount.append(this.template)
+        }
+      }
+      this.clearShorthandClasses(rootShadowMount)
       this.app.mount(rootShadowMount)
 
       if (!host.shadowRoot) {
+        // Polyfill that DSD!
         host.attachShadow({ mode: "open" })
-        host.shadowRoot.append(rootShadowMount)
-      } else {
-        host.shadowRoot.replaceChildren(rootShadowMount)
       }
+      host.shadowRoot.replaceChildren(rootShadowMount)
     } else {
-      host.replaceChildren(this.template)
+      if (this.template) {
+        host.replaceChildren(this.template)
+      }
+      this.clearShorthandClasses(host)
       this.app.mount(host)
     }
   }
@@ -135,21 +152,14 @@ export class PetiteController {
     return data
   }
 
-  findScopedStyles(host) {
-    const tagName = host.localName
-    const scopeId = `${tagName}-scope`
-    this.template.querySelectorAll("template[scoped-style]").forEach((styleTemplate) => {
-      if (!document.head.querySelector(`style#${scopeId}`)) {
-        const styleTag = styleTemplate.content.querySelector("style")
-        const styles = styleTag.textContent
-        styleTag.textContent = styles
-          .replaceAll(/[\s,]*(.+?)\s*?([{,])/g, ` ${tagName} $1 $2`)
-          .replaceAll(RegExp(`${tagName} :host\\(?(.*?)\\)?\\s+`, "g"), `${tagName}$1 `)
-        styleTag.id = scopeId
-        document.head.append(styleTag)
-      }
-
-      styleTemplate.remove()
+  // Since petite-vue will render out the right classes on mount, we need to strip
+  // the SSRed classes first, otherwise there's class duplication
+  clearShorthandClasses(fragment) {
+    fragment.querySelectorAll("[\\:class]").forEach(node => {
+      node.removeAttribute("class")
+    })
+    fragment.querySelectorAll("[v-bind\\:class]").forEach(node => {
+      node.removeAttribute("class")
     })
   }
 }
