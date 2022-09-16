@@ -1,5 +1,22 @@
 import { createApp, reactive } from "petite-vue"
 
+// Extracted from turbo-shadow package
+export const ShadowRootable = (superClass) => class extends superClass {
+  #shadowRootConnected;
+
+  attachedShadowRootCallback() {
+    this.#shadowRootConnected?.()
+  }
+
+  get shadowRootAttached() {
+    if (this.shadowRoot) return Promise.resolve()
+
+    const promise = new Promise(resolve => this.#shadowRootConnected = resolve)
+
+    return promise
+  }
+}
+
 export class ControlledElement extends HTMLElement {
   addController(controller) {
     ;(this.__controllers ??= []).push(controller)
@@ -38,7 +55,7 @@ export class PetiteController {
     ;(this.host = host).addController(this)
   }
 
-  hostConnected() {
+  async hostConnected() {
     if (this.app) {
       // Our app's still running, so we'll just let it continue to flourish!
       return
@@ -82,14 +99,22 @@ export class PetiteController {
       const rootShadowMount = document.createElement("petite-root")
       rootShadowMount.style.display = "contents"
       if (host.shadowRoot || host.querySelector("template[shadowroot]")) {
+        // We're in Declarative Shadow DOM territory
         if (host.shadowRoot) {
           // DSD is a go!
           rootShadowMount.append(...host.shadowRoot.childNodes)
         } else {
-          // We'll copy template content manually
-          rootShadowMount.append(host.querySelector("template[shadowroot]").content.cloneNode(true))
+          if ("shadowRootAttached" in host) {
+            // We'll wait for a promise if it's available
+            await host.shadowRootAttached
+            rootShadowMount.append(...host.shadowRoot.childNodes)
+          } else {
+            // We'll copy template content manually, but that ain't great
+            rootShadowMount.append(host.querySelector("template[shadowroot]").content.cloneNode(true))
+          }
         }
       } else {
+        // Let's look for a client-side template
         if (this.template) {
           rootShadowMount.append(this.template)
         }
@@ -98,11 +123,12 @@ export class PetiteController {
       this.app.mount(rootShadowMount)
 
       if (!host.shadowRoot) {
-        // Polyfill that DSD!
+        // Time to attach a shadow root (no DSD)
         host.attachShadow({ mode: "open" })
       }
       host.shadowRoot.replaceChildren(rootShadowMount)
     } else {
+      // Handle light DOM-only templates
       if (this.template) {
         host.replaceChildren(this.template)
       }
@@ -170,7 +196,7 @@ export const reflect = (hostClass, name) => {
   return name
 }
 
-export class PetiteElement extends ControlledElement {
+export class PetiteElement extends ShadowRootable(ControlledElement) {
   static define() {
     if (!customElements.get(this.setup.tagName)) {
       customElements.define(this.setup.tagName, this)
