@@ -36,9 +36,9 @@ Example:
   TestPetiteElement.define()
 </script>
 
-<h1>{{ text }}</h1>
+<h1 v-text="text">Text</h1>
 
-<p>{{ count }}</p>
+<p v-text="count">0</p>
 
 <slot></slot>
 
