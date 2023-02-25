@@ -1,6 +1,6 @@
 # petite-element (WIP)
 
-**Update:** this was a fun project to work on, but I've decided to focus instead on the [Crystallized](https://github.com/whitefusionhq/crystallized) project and addding reactivity to vanilla web components via a layer of integration around [Signals](https://github.com/preactjs/signals) alongside the Crystallized's declarative actions functionality. Enjoy!
+**Update:** this was a fun project to work on, but I've decided to focus instead on the [Crystallized](https://github.com/whitefusionhq/crystallized) project and addding reactivity to vanilla web components via a layer of integration around [Signals](https://github.com/preactjs/signals) alongside Crystallized's declarative actions functionality. Enjoy!
 
 ----
 
